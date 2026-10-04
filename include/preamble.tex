@@ -1,0 +1,140 @@
+\usepackage[
+  margin=1.5cm, 
+  top=1.8cm, 
+  bottom=1.4cm,
+  footskip=0.8cm,
+  headsep=0.4cm,
+]{geometry}
+\usepackage{xcolor}
+\usepackage{guitarchordschemes}
+\usepackage{titlesec}
+\usepackage[colorlinks=true, linkcolor=black]{hyperref}
+\usepackage{subfiles}
+\usepackage{fancyhdr}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+
+\usepackage{extramarks} % Provides \lastrightmark
+\usepackage{ifthen}     % Provides conditional logic
+
+\pagestyle{fancy}
+\fancyhf{} % Clear all headers and footers
+
+% Store titles without numbers
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+\renewcommand{\subsectionmark}[1]{\markright{#1}}
+
+\fancyhead[R]{%
+  \nouppercase{\leftmark}%
+  \ifthenelse{\equal{\lastrightmark}{}}{}{ / \nouppercase{\lastrightmark}}%
+}
+\fancyfoot[R]{\thepage}
+
+% 1. REMOVE THE HEADER LINE
+\renewcommand{\headrulewidth}{0pt}
+
+% ---------------------------------------------------------
+% COLOR DEFINITIONS & TEXT LABEL SHORTCUTS
+% ---------------------------------------------------------
+\definecolor{rootcol}{RGB}{255,0,0}
+\definecolor{thirdcol}{RGB}{0, 0, 255}
+\definecolor{fifthcol}{RGB}{0, 175, 0}
+\definecolor{seventhcol}{RGB}{255,0,255}
+\definecolor{tensioncol}{RGB}{255,130,0} 
+
+\newcommand{\R}{\textcolor{rootcol}{R}}
+\newcommand{\third}[1]{\textcolor{thirdcol}{#1}}
+\newcommand{\fifth}[1]{\textcolor{fifthcol}{#1}}
+\newcommand{\seventh}[1]{\textcolor{seventhcol}{#1}}
+\newcommand{\sixth}[1]{\textcolor{seventhcol}{#1}}
+\newcommand{\tension}[1]{\textcolor{tensioncol}{#1}}
+
+\renewcommand{\b}{\ensuremath{\flat}}
+\newcommand{\bb}{\ensuremath{\flat\mkern-1.5mu\flat}}
+
+\usepackage{expl3}
+
+\ExplSyntaxOn
+% Helper function to convert macro inputs (e.g. "m7\b5") into clean TikZ coordinate tags ("m7b5")
+\cs_new_protected:Npn \sanitize_tag:Nn #1#2
+ {
+   \str_set:Nx #1 { \detokenize{#2} }
+   \str_remove_all:Nn #1 { ~ }
+   \str_remove_all:Nn #1 { \c_backslash_str }
+   \str_remove_all:Nn #1 { $ }
+   \str_remove_all:Nn #1 { { }
+   \str_remove_all:Nn #1 { } }
+ }
+
+% Variable to hold current default muted strings
+\newcommand{\defaultmute}{}
+\newcommand{\setmute}[1]{\gdef\defaultmute{#1}}
+
+% Optional: Wrapper to combine \subsection and \setmute in one command
+\newcommand{\stringset}[2][]{%
+  \setmute{#1}%
+  \subsubsection{#2}%
+}
+
+% Helper to expand \defaultmute into actual numbers before calling \chordscheme
+\newcommand{\renderchord}[1]{%
+  \ifx\defaultmute\empty
+    \chordscheme[#1]%
+  \else
+    \expanded{\noexpand\chordscheme[mute={\defaultmute}, \unexpanded{#1}]}%
+  \fi
+}
+
+% Renewed \chordrow using \renderchord
+\NewDocumentCommand{\chordrow}{m m m m m}{%
+  \phantomsection%
+  \noindent%
+  \raisebox{-0.5\height}{\makebox[1.5cm][r]{\large\bfseries #1}\hspace{0.1em}}%
+  \raisebox{-0.5\height}{\renderchord{#2}}\hfill%
+  \raisebox{-0.5\height}{\renderchord{#3}}\hfill%
+  \raisebox{-0.5\height}{\renderchord{#4}}\hfill%
+  \raisebox{-0.5\height}{\renderchord{#5}}%
+  \sanitize_tag:Nn \l_tmpa_str {#1}%
+  \tikz[remember~picture, overlay] \coordinate (s\arabic{section}-ss\arabic{subsection}-sss\arabic{subsubsection}-\l_tmpa_str);%
+  \par\vspace{6pt}%
+}
+
+% Updated \drawbrace (automatically cleans its arguments)
+\NewDocumentCommand{\drawbrace}{m m}{%
+  \sanitize_tag:Nn \l_tmpa_str {#1}%
+  \sanitize_tag:Nn \l_tmpb_str {#2}%
+  \begin{tikzpicture}[remember~picture, overlay]
+    \draw[decorate, decoration={brace, amplitude=5pt}, thick]
+      ([xshift=10pt, yshift=0.5cm] s\arabic{section}-ss\arabic{subsection}-sss\arabic{subsubsection}-\l_tmpa_str) -- 
+      ([xshift=10pt, yshift=-0.5cm] s\arabic{section}-ss\arabic{subsection}-sss\arabic{subsubsection}-\l_tmpa_str |- s\arabic{section}-ss\arabic{subsection}-sss\arabic{subsubsection}-\l_tmpb_str)
+      node[midway, xshift=6pt, anchor=west] {};
+  \end{tikzpicture}%
+}
+\ExplSyntaxOff
+
+% ---------------------------------------------------------
+% VANILLA GUITARCHORDSCHEMES SETTINGS
+% ---------------------------------------------------------
+\setchordscheme{
+  chord-frets = 5,
+  x-unit = 4.2mm,
+  y-unit = 5.5mm,
+  finger-format = \footnotesize\sffamily\bfseries,
+  name-distance = -2mm,
+  string-name-format = \nullfont,
+}
+
+% ---------------------------------------------------------
+% HIERARCHY & TOC CONFIGURATION
+% ---------------------------------------------------------
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{0}
+
+\titleformat{\section}{\LARGE\bfseries}{\thesection}{0pt}{}
+\titlespacing*{\section}{0pt}{12pt}{3pt}
+
+\titleformat{\subsection}{\Large\bfseries}{\thesubsection}{0pt}{}
+\titlespacing*{\subsection}{0pt}{8pt}{3pt}
+
+\titleformat{\subsubsection}{\large\bfseries}{\thesubsubsection}{0pt}{}
+\titlespacing*{\subsubsection}{0pt}{8pt}{0pt}

@@ -1,0 +1,40 @@
+\documentclass[../main.tex]{subfiles}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{2.5cm}
+
+    {\Huge \bfseries GUITAR CHORD VOICINGS \par}
+    \vspace{0.5cm}
+    {\Large \itshape A living, breathing, terrifyingly thorough reference catalogue \par}
+    
+    \vspace{1.2cm}
+    % Subtle, single elegant accent line
+    \rule{0.35\textwidth}{0.6pt}\par
+
+    \vfill
+
+    % Larger hero diagram with comfortable label gap
+    \makebox[\textwidth][c]{%
+      \makebox[0pt][r]{$\vcenter{\hbox{\LARGE\bfseries m69}}$\hspace{0.8cm}}%
+      $\vcenter{\hbox{\scalebox{2.0}{%
+        \renderchord{finger = {3/5:\fifth{5}, 5/4:\tension{9}, 1/3:\third{\b3}, 3/2:\sixth{6}}, mute = {1, 6}}%
+      }}}$%
+    }\par
+
+    \vfill
+
+    % Matching bottom accent rule
+    \rule{0.25\textwidth}{0.4pt}\par
+    \vspace{0.8cm}
+
+    {\Large \bfseries Bernardo \par}
+    \vspace{0.3cm}
+    {\large Last Updated: \today \par}
+
+    \vspace*{2cm}
+\end{titlepage}
+
+\end{document}
