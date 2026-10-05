@@ -107,7 +107,7 @@
 \NewDocumentCommand{\chordrow}{m m m m m}{%
   \phantomsection%
   \noindent%
-  \raisebox{-0.5\height}{\makebox[1.8cm][r]{\large\bfseries #1}\hspace{0.1em}}%
+ \raisebox{-0.5\height}{\parbox[b]{1.8cm}{\raggedleft\large\bfseries #1}\hspace{0.1em}}%
   \raisebox{-0.5\height}{\renderchord{#2}}\hfill%
   \raisebox{-0.5\height}{\renderchord{#3}}\hfill%
   \raisebox{-0.5\height}{\renderchord{#4}}\hfill%
