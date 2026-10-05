@@ -49,32 +49,50 @@
 \newcommand{\sixth}[1]{\textcolor{seventhcol}{#1}}
 \newcommand{\tension}[1]{\textcolor{tensioncol}{#1}}
 
+\newcommand{\s}{\ensuremath{\sharp}}
 \renewcommand{\b}{\ensuremath{\flat}}
 \newcommand{\bb}{\ensuremath{\flat\mkern-1.5mu\flat}}
+
+% ---------------------------------------------------------
+% DUAL NOTE LABEL MACROS (FIXED FOR TEXT MODE & TIKZ)
+% ---------------------------------------------------------
+% 1. Side-by-side slash label (using \hspace instead of math-only \mkern)
+\newcommand{\duallabel}[2]{#1/#2}
+
+% 2. Vertically stacked label (using a tight tabular for clean TikZ node rendering)
+\newcommand{\stackedlabel}[2]{%
+  \raisebox{-0.1ex}{\scriptsize\renewcommand{\arraystretch}{0.75}\begin{tabular}{@{}c@{}}#1\\#2\end{tabular}}%
+}
 
 \usepackage{expl3}
 
 \ExplSyntaxOn
-% Helper function to convert macro inputs (e.g. "m7\b5") into clean TikZ coordinate tags ("m7b5")
+% Helper function to convert macro inputs (e.g. "7\s5 / 7\b13") into clean TikZ coordinate tags ("7s57b13")
 \cs_new_protected:Npn \sanitize_tag:Nn #1#2
  {
    \str_set:Nx #1 { \detokenize{#2} }
    \str_remove_all:Nn #1 { ~ }
    \str_remove_all:Nn #1 { \c_backslash_str }
    \str_remove_all:Nn #1 { $ }
-   \str_remove_all:Nn #1 { { }
-   \str_remove_all:Nn #1 { } }
+   \str_remove_all:Nn #1 { / }
+   \str_remove_all:Nn #1 { ( }
+   \str_remove_all:Nn #1 { ) }
+   \str_remove_all:Nn #1 { + }
+   \str_remove_all:Nn #1 { , }
+   \str_remove_all:Nn #1 { \c_left_brace_str }
+   \str_remove_all:Nn #1 { \c_right_brace_str }
  }
 
 % Variable to hold current default muted strings
 \newcommand{\defaultmute}{}
 \newcommand{\setmute}[1]{\gdef\defaultmute{#1}}
 
-% Optional: Wrapper to combine \subsection and \setmute in one command
+% Optional: Wrapper to combine \subsubsection and \setmute in one command
 \newcommand{\stringset}[2][]{%
   \setmute{#1}%
   \subsubsection{#2}%
 }
+\let\chordsubsection\stringset
 
 % Helper to expand \defaultmute into actual numbers before calling \chordscheme
 \newcommand{\renderchord}[1]{%
@@ -89,7 +107,7 @@
 \NewDocumentCommand{\chordrow}{m m m m m}{%
   \phantomsection%
   \noindent%
-  \raisebox{-0.5\height}{\makebox[1.5cm][r]{\large\bfseries #1}\hspace{0.1em}}%
+  \raisebox{-0.5\height}{\makebox[1.8cm][r]{\large\bfseries #1}\hspace{0.1em}}%
   \raisebox{-0.5\height}{\renderchord{#2}}\hfill%
   \raisebox{-0.5\height}{\renderchord{#3}}\hfill%
   \raisebox{-0.5\height}{\renderchord{#4}}\hfill%
@@ -111,7 +129,6 @@
   \end{tikzpicture}%
 }
 \ExplSyntaxOff
-
 % ---------------------------------------------------------
 % VANILLA GUITARCHORDSCHEMES SETTINGS
 % ---------------------------------------------------------
